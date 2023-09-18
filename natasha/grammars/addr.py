@@ -800,8 +800,15 @@ GOROD_WORDS = or_(
     Settlement.type.const('город')
 )
 
+GOROD_IDNT = or_(
+    rule(caseless(',')), # особый случай запятой сразу после города
+).interpretation(
+    Settlement.type.const('город')
+)
+
 GOROD = or_(
     rule(GOROD_WORDS, MAYBE_GOROD_NAME),
+    rule(GOROD_NAME, GOROD_IDNT), # формат "Город"
     rule(
         GOROD_WORDS.optional(),
         GOROD_NAME
