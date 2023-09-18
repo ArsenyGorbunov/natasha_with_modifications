@@ -1,4 +1,3 @@
-
 from yargy import (
     rule,
     or_, and_
@@ -13,7 +12,6 @@ from yargy.predicates import (
 )
 from yargy.pipelines import morph_pipeline
 from yargy.tokenizer import QUOTES
-
 
 Index = fact(
     'Index',
@@ -57,6 +55,7 @@ def value(key):
     @property
     def field(self):
         return getattr(self, key)
+
     return field
 
 
@@ -119,7 +118,6 @@ ANUM = rule(
     })
 )
 
-
 #########
 #
 #  STRANA
@@ -145,7 +143,6 @@ COUNTRY = or_(
 ).interpretation(
     Country
 )
-
 
 #############
 #
@@ -194,7 +191,6 @@ FED_OKRUG = rule(
     Region
 )
 
-
 #########
 #
 #   RESPUBLIKA
@@ -203,7 +199,7 @@ FED_OKRUG = rule(
 
 
 RESPUBLIKA_WORDS = or_(
-    rule(caseless(',')), # после республики сразу запятая
+    rule(caseless(',')),  # после республики сразу запятая
     rule(caseless('респ'), DOT.optional()),
     rule(normalized('республика'))
 ).interpretation(
@@ -272,14 +268,13 @@ RESPUBLIKA_ABBR = in_caseless({
 )
 
 RESPUBLIKA = or_(
-    rule(RESPUBLIKA_NAME, RESPUBLIKA_WORDS), # запятая может быть после наименования
+    rule(RESPUBLIKA_NAME, RESPUBLIKA_WORDS),  # запятая может быть после наименования
     rule(RESPUBLIKA_ADJF, RESPUBLIKA_WORDS),
     rule(RESPUBLIKA_WORDS, RESPUBLIKA_NAME),
     rule(RESPUBLIKA_ABBR)
 ).interpretation(
     Region
 )
-
 
 ##########
 #
@@ -311,7 +306,6 @@ KRAI = rule(
 ).interpretation(
     Region
 )
-
 
 ############
 #
@@ -393,7 +387,6 @@ OBLAST = rule(
     Region
 )
 
-
 ##########
 #
 #    AUTO OKRUG
@@ -467,7 +460,6 @@ AUTO_OKRUG = or_(
     Region
 )
 
-
 ##########
 #
 #  RAION
@@ -516,7 +508,6 @@ RAION = rule(
 ).interpretation(
     Raion
 )
-
 
 ###########
 #
@@ -744,7 +735,7 @@ SIMPLE = dictionary({
 GOROD_ABBR = in_caseless({
     'спб',
     'мск',
-    'нск'   # Новосибирск
+    'нск'  # Новосибирск
 })
 
 GOROD_NAME = or_(
@@ -801,14 +792,14 @@ GOROD_WORDS = or_(
 )
 
 GOROD_IDNT = or_(
-    rule(caseless(',')), # особый случай запятой сразу после города
+    rule(caseless(',')),  # особый случай запятой сразу после города
 ).interpretation(
     Settlement.type.const('город')
 )
 
 GOROD = or_(
     rule(GOROD_WORDS, MAYBE_GOROD_NAME),
-    rule(GOROD_NAME, GOROD_IDNT), # формат "Город"
+    rule(GOROD_NAME, GOROD_IDNT),  # формат "Город"
     rule(
         GOROD_WORDS.optional(),
         GOROD_NAME
@@ -816,7 +807,6 @@ GOROD = or_(
 ).interpretation(
     Settlement
 )
-
 
 ##########
 #
@@ -852,7 +842,6 @@ SETTLEMENT_NAME = or_(
     rule(NAME, ANUM)
 )
 
-
 ###########
 #
 #   SELO
@@ -881,7 +870,6 @@ SELO = rule(
     Settlement
 )
 
-
 ###########
 #
 #   DEREVNYA
@@ -909,7 +897,6 @@ DEREVNYA = rule(
 ).interpretation(
     Settlement
 )
-
 
 ###########
 #
@@ -961,7 +948,6 @@ POSELOK = rule(
 ).interpretation(
     Settlement
 )
-
 
 ##############
 #
@@ -1092,7 +1078,6 @@ MAYBE_PERSON = or_(
     rule(POSITION_WORDS, TITLE)
 )
 
-
 ###########
 #
 #   IMENI
@@ -1169,7 +1154,6 @@ LET = rule(
     LET_NAME
 )
 
-
 ##########
 #
 #    ADDR DATE
@@ -1210,7 +1194,6 @@ DATE = or_(
     rule(DAY, MONTH_WORDS),
     rule(YEAR, YEAR_WORDS)
 )
-
 
 #########
 #
@@ -1285,7 +1268,6 @@ MODIFIER_WORDS = or_(
     SHORT_MODIFIER_WORDS,
 )
 
-
 ##########
 #
 #   ADDR NAME
@@ -1353,7 +1335,6 @@ NAME = or_(
 
 ADDR_NAME = NAME
 
-
 ########
 #
 #    STREET
@@ -1381,7 +1362,6 @@ STREET = or_(
 ).interpretation(
     Street
 )
-
 
 ##########
 #
@@ -1417,6 +1397,44 @@ PROSPEKT = or_(
     Street
 )
 
+##########
+#
+#  MKR
+#
+##########
+
+MKR_WORDS = or_(
+    rule(
+        caseless('м'),
+        '-',
+        caseless('рн'), # м-рн. or м-рн
+        DOT.optional()
+    ),
+    rule(
+        caseless('мкр'),  # мкр or мкp.
+        DOT.optional()
+    ),
+    rule(
+        caseless('микрорайон'),  # микрорайон
+        DOT.optional()
+    ),
+    rule(
+        normalized('микрорайон')
+    ),
+).interpretation(
+    Street.type.const('микрорайон')  # тип: микрорайон
+)
+
+MKR_NAME = ADDR_NAME.interpretation(
+    Street.name
+)
+
+MKR = or_(
+    rule(MKR_WORDS, MKR_NAME),  # мкр. невский
+    rule(MKR_NAME, MKR_WORDS),  # 2 Sатулинский мкр
+).interpretation(
+    Street
+)
 
 ############
 #
@@ -1448,7 +1466,6 @@ PROEZD = or_(
 ).interpretation(
     Street
 )
-
 
 ###########
 #
@@ -1482,7 +1499,6 @@ PEREULOK = or_(
     Street
 )
 
-
 ########
 #
 #  PLOSHAD
@@ -1510,7 +1526,6 @@ PLOSHAD = or_(
 ).interpretation(
     Street
 )
-
 
 ############
 #
@@ -1546,7 +1561,6 @@ SHOSSE = or_(
     Street
 )
 
-
 ########
 #
 #  NABEREG
@@ -1574,7 +1588,6 @@ NABEREG = or_(
 ).interpretation(
     Street
 )
-
 
 ########
 #
@@ -1613,7 +1626,6 @@ BULVAR = or_(
     Street
 )
 
-
 ##############
 #
 #   ADDR VALUE
@@ -1648,7 +1660,6 @@ ADDR_VALUE = rule(
     VALUE
 )
 
-
 ############
 #
 #    DOM
@@ -1676,7 +1687,6 @@ DOM = rule(
 ).interpretation(
     Building
 )
-
 
 ###########
 #
@@ -1712,7 +1722,6 @@ KORPUS = or_(
     Building
 )
 
-
 ###########
 #
 #  STROENIE
@@ -1740,7 +1749,6 @@ STROENIE = rule(
 ).interpretation(
     Building
 )
-
 
 ###########
 #
@@ -1770,7 +1778,6 @@ OFIS = rule(
     Room
 )
 
-
 ###########
 #
 #   KVARTIRA
@@ -1799,7 +1806,6 @@ KVARTIRA = rule(
     Room
 )
 
-
 ###########
 #
 #   INDEX
@@ -1816,7 +1822,6 @@ INDEX = and_(
 ).interpretation(
     Index
 )
-
 
 #############
 #
@@ -1850,6 +1855,7 @@ ADDR_PART = or_(
     SHOSSE,
     NABEREG,
     BULVAR,
+    MKR,
 
     DOM,
     KORPUS,
