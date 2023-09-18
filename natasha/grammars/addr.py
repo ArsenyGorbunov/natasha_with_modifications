@@ -203,6 +203,7 @@ FED_OKRUG = rule(
 
 
 RESPUBLIKA_WORDS = or_(
+    rule(caseless(',')), # после республики сразу запятая
     rule(caseless('респ'), DOT.optional()),
     rule(normalized('республика'))
 ).interpretation(
@@ -271,6 +272,7 @@ RESPUBLIKA_ABBR = in_caseless({
 )
 
 RESPUBLIKA = or_(
+    rule(RESPUBLIKA_NAME, RESPUBLIKA_WORDS), # запятая может быть после наименования
     rule(RESPUBLIKA_ADJF, RESPUBLIKA_WORDS),
     rule(RESPUBLIKA_WORDS, RESPUBLIKA_NAME),
     rule(RESPUBLIKA_ABBR)
