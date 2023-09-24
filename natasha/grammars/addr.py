@@ -103,7 +103,6 @@ class AddrPart(AddrPart):
 
 DASH = eq('-')
 DOT = eq('.')
-
 ADJF = gram('ADJF')
 NOUN = gram('NOUN')
 INT = type('INT')
@@ -757,7 +756,7 @@ SIMPLE = and_(
 COMPLEX = or_(
     rule(
         SIMPLE,
-        DASH.optional(),
+        DASH,
         SIMPLE
     ),
     rule(
